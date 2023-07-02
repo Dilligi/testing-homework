@@ -470,7 +470,7 @@ describe('Корзина', () => {
         expect(cartRender.container.querySelector(`a[href*="/catalog"]`)).not.toBeNull();
     });
 
-    it('Если заполненные в форме поля не проходят валидацию, то выдает оишбку, иначе пропускает дальше', async () => {
+    it('Если заполненные в форме поля не проходят валидацию, то выдает оишбку, иначе пропускает дальше и возвращает сообщение с успехом', async () => {
         let formComp = (
             <BrowserRouter>
                 <Provider store={store}>
@@ -506,5 +506,8 @@ describe('Корзина', () => {
         expect(nameInput.className.includes('is-invalid')).not.toBeTruthy()
         expect(phoneInput.className.includes('is-invalid')).not.toBeTruthy()
         expect(addressInput.className.includes('is-invalid')).not.toBeTruthy()
+
+        let successMessage = cartRender.container.querySelector('.Cart-SuccessMessage')
+        expect(successMessage).not.toBeNull()
     });
 });
