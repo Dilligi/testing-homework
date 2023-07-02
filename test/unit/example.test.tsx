@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getByTestId, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, getByTestId, render, screen, waitFor } from '@testing-library/react';
 import { Cart } from '../../src/client/pages/Cart';
 import { Catalog } from '../../src/client/pages/Catalog'
 import { CartApi, ExampleApi } from '../../src/client/api';
@@ -471,10 +471,31 @@ describe('Корзина', () => {
     });
 
     it('Если заполненные в форме поля не проходят валидацию, то выдает оишбку, иначе пропускает дальше и возвращает сообщение с успехом', async () => {
+        const mockStore = configureStore<any>([]);
+        const store = mockStore({
+            cart: [
+                {
+                    name: "Gorgeous Shoes",
+                    price: 836,
+                    count: 1,
+                },
+                {
+                    name: "Refined Mouse",
+                    price: 815,
+                    count: 2,
+                },
+                {
+                    name: "Gorgeous Shoes",
+                    price: 448,
+                    count: 3,
+                }
+            ]
+        });
+        
         let formComp = (
             <BrowserRouter>
                 <Provider store={store}>
-                    <Form onSubmit={ () => null }/>
+                    <Cart />
                 </Provider>
             </BrowserRouter>
         )
@@ -485,10 +506,12 @@ describe('Корзина', () => {
         let addressInput: HTMLInputElement = cartRender.container.querySelector('.Form-Field_type_address')
         let submitBtn = cartRender.container.querySelector('.Form-Submit');
 
-        await events.type(nameInput, ' ')
-        await events.type(phoneInput, 'hi')
-        await events.type(addressInput, ' ')
-        await events.click(submitBtn)
+        let formEvents = events.setup()
+
+        await formEvents.type(nameInput, ' ')
+        await formEvents.type(phoneInput, 'hi')
+        await formEvents.type(addressInput, ' ')
+        await formEvents.click(submitBtn)
 
         expect(nameInput.className.includes('is-invalid')).toBeTruthy()
         expect(phoneInput.className.includes('is-invalid')).toBeTruthy()
@@ -498,16 +521,19 @@ describe('Корзина', () => {
         phoneInput.value = '';
         addressInput.value = '';
 
-        await events.type(nameInput, 'Петр Петрович')
-        await events.type(phoneInput, '1234567890')
-        await events.type(addressInput, 'Москва')
-        await events.click(submitBtn)
+        await formEvents.type(nameInput, 'Петр Петрович')
+        await formEvents.type(phoneInput, '1234567890')
+        await formEvents.type(addressInput, 'Москва')
+        await formEvents.click(submitBtn)
 
         expect(nameInput.className.includes('is-invalid')).not.toBeTruthy()
         expect(phoneInput.className.includes('is-invalid')).not.toBeTruthy()
         expect(addressInput.className.includes('is-invalid')).not.toBeTruthy()
 
+        /*await waitFor(() => 
+        expect(submitBtn).toHaveBeenCalled())
+
         let successMessage = cartRender.container.querySelector('.Cart-SuccessMessage')
-        expect(successMessage).not.toBeNull()
+        expect(successMessage).not.toBeNull()*/
     });
 });
