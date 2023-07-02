@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { cn } from '@bem-react/classname';
+import { commerce } from 'faker';
 
 import { ProductItem } from '../components/ProductItem';
 import { ApplicationState, productsLoad } from '../store';
